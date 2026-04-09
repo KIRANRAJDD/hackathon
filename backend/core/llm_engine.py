@@ -2,6 +2,12 @@ import json
 import logging
 from .config import settings
 
+try:
+    from google import genai
+    from google.genai import types
+except ImportError:
+    pass
+
 logger = logging.getLogger(__name__)
 
 async def generate_tests_from_llm(prompt: str) -> dict:
@@ -12,22 +18,43 @@ async def generate_tests_from_llm(prompt: str) -> dict:
         logger.info("Using MOCK LLM response. (Set USE_MOCK_LLM=False and provide an API key in config to generate real tests).")
         return _get_mock_response()
     
-    elif settings.OPENAI_API_KEY:
-        logger.info("Using OpenAI integration.")
-        # This is where you would call openai.AsyncOpenAI().chat.completions.create(...)
-        # For simplicity in this mock structure, we simulate a failure if the package isn't installed.
-        raise NotImplementedError("OpenAI client not fully implemented. Please use MOCK_LLM or implement the OpenAI API call here.")
-        
     elif settings.GEMINI_API_KEY:
         logger.info("Using Gemini integration.")
-        # This is where you would call google.generativeai.generate_content(...)
-        raise NotImplementedError("Gemini client not fully implemented. Please use MOCK_LLM or implement the Gemini API call here.")
+        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        
+        try:
+            # We configure it directly to return pure JSON
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
+            )
+            raw_text = response.text
+            
+            # Since we enforced JSON via the prompt and mime_type, we can safely parse
+            try:
+                parsed_data = json.loads(raw_text)
+                return parsed_data
+            except json.JSONDecodeError as decode_err:
+                logger.error(f"Failed to decode JSON from Gemini: {raw_text}")
+                # Fallback to mock on parsing error so the UI doesn't crash completely during dev
+                return _get_mock_response()
+
+        except Exception as e:
+            logger.error(f"Gemini API failed: {str(e)}")
+            raise e
+            
+    elif settings.OPENAI_API_KEY:
+        logger.info("Using OpenAI integration.")
+        raise NotImplementedError("OpenAI client not fully implemented. Please use MOCK_LLM or implement the OpenAI API call here.")
         
     else:
         raise ValueError("No LLM provider configured and USE_MOCK_LLM is false.")
 
 def _get_mock_response() -> dict:
-    """Returns a highly detailed mock response for demonstration."""
+    """Returns a highly detailed mock response for demonstration/fallback."""
     return {
         "summary": "The provided codebase is a Python script that calculates factorial. The core logic involves a recursive or iterative function. The component is standalone with no external dependencies. A recursion depth edge case is detected.",
         "scenarios": [

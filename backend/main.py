@@ -1,9 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
+from typing import Optional
+import os
 
 from core.llm_engine import generate_tests_from_llm
-from parser.language_router import route_and_parse
+from parser.language_router import route_and_parse, detect_language
 from generator.prompt_builder import build_prompt
 from generator.output_formatter import check_json_output, save_test_file
 
@@ -18,14 +22,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve frontend static files
+frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/static/index.html")
+
 class CodeRequest(BaseModel):
     code: str
-    language: str
+    language: Optional[str] = None
 
 @app.post("/generate")
 async def generate_tests(request: CodeRequest):
     if not request.code.strip():
         raise HTTPException(status_code=400, detail="Source code cannot be empty.")
+        
+    if not request.language:
+        request.language = detect_language(request.code)
         
     # Phase 1: Parse AST
     ast_analysis = route_and_parse(request.code, request.language)
@@ -43,7 +58,7 @@ async def generate_tests(request: CodeRequest):
     formatted_output = check_json_output(raw_llm_response)
     
     # Phase 5: Save files to disk
-    ext = "py" if request.language.lower() == "python" else "js" if request.language.lower() in ["javascript", "js"] else "txt"
+    ext = "py" if request.language.lower() == "python" else "js" if request.language.lower() in ["javascript", "js", "typescript"] else "go" if request.language.lower() in ["go", "golang"] else "txt"
     save_test_file(formatted_output["unit_tests"], f"test_unit.{ext}")
     save_test_file(formatted_output["integration_tests"], f"test_integration.{ext}")
     save_test_file(formatted_output["edge_cases"], f"test_edge.{ext}")

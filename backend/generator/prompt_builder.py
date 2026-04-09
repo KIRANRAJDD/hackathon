@@ -11,10 +11,10 @@ def build_prompt(code: str, language: str, ast_analysis: dict) -> str:
 1. Analyze the provided source code including Functions, Classes, Methods, Modules, and Dependencies.
 2. Generate:
    - Unit Tests
-   - Integration Tests
+   - Integration Tests (For Integration Tests: Ensure you write FULLY MOCK-BASED integration tests. If the function interacts with external services or complex dependencies, use standard mocking libraries (e.g., `unittest.mock` for Python, `jest.mock` for JS) to simulate these interactions. Ensure internal logic integration is tested while mocking the boundaries.)
    - Edge Case Tests (boundary values, invalid inputs, exceptions)
 3. Ensure high code coverage and meaningful assertions.
-4. Use standard testing frameworks (pytest for python, Jest for JS, JUnit for Java).
+4. Use standard testing frameworks (pytest for python, Jest for JS, JUnit for Java, standard `testing` framework for Go).
 
 ### Input Code:
 ```{language}

@@ -3,94 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Test Generator System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <title>AI Test Generator (React)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              main: '#0B0E14',
+              panel: 'rgba(20, 24, 34, 0.6)',
+              border: 'rgba(255, 255, 255, 0.08)',
+              accent: '#7C4DFF',
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['Fira Code', 'monospace']
+            }
+          }
+        }
+      }
+    </script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel JSX Compiler -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Global Style Resets -->
+    <style>
+      body {
+        background-color: #0B0E14;
+        color: #EEF2F6;
+        background-image: 
+          radial-gradient(circle at 15% 50%, rgba(124, 77, 255, 0.08), transparent 25%),
+          radial-gradient(circle at 85% 30%, rgba(0, 212, 255, 0.05), transparent 25%);
+        min-height: 100vh;
+      }
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #0B0E14; }
+      ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+      textarea, pre { outline: none; }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="glass-header">
-            <div class="logo">
-                <span class="sparkle">✨</span> AutoTest<span class="accent-text">AI</span>
-            </div>
-            <p class="subtitle">Intelligent Test Suite Generation</p>
-        </header>
-
-        <!-- Main Workspace -->
-        <main class="workspace">
-            <!-- Left Panel: Input -->
-            <section class="input-panel glass-panel">
-                <div class="panel-header">
-                    <h2>Input Source Code</h2>
-                    <select id="language-select" class="modern-select">
-                        <option value="python">Python</option>
-                        <option value="javascript">JavaScript</option>
-                        <option value="java">Java</option>
-                    </select>
-                </div>
-                
-                <textarea id="code-input" class="code-editor" placeholder="Paste your source code here...&#10;&#10;def fibonacci(n):&#10;    if n <= 1: return n&#10;    return fibonacci(n-1) + fibonacci(n-2)"></textarea>
-                
-                <button id="generate-btn" class="glow-on-hover">
-                    <span class="btn-text">Generate Test Suite</span>
-                    <div class="loader hidden"></div>
-                </button>
-            </section>
-
-            <!-- Right Panel: Output -->
-            <section class="output-panel glass-panel">
-                <div class="panel-header">
-                    <h2>Generated Tests</h2>
-                </div>
-                
-                <div id="welcome-message" class="empty-state">
-                    <div class="orb-container">
-                        <div class="ambient-orb"></div>
-                    </div>
-                    <h3>Ready to analyze.</h3>
-                    <p>Paste code on the left and hit generate.</p>
-                </div>
-
-                <div id="results-container" class="results-container hidden">
-                    <div class="tabs">
-                        <button class="tab-btn active" data-target="tab-summary">Summary</button>
-                        <button class="tab-btn" data-target="tab-unit">Unit Tests</button>
-                        <button class="tab-btn" data-target="tab-integration">Integration</button>
-                        <button class="tab-btn" data-target="tab-edge">Edge Cases</button>
-                    </div>
-
-                    <div class="tab-content" id="tab-summary">
-                        <h3>Code Analysis</h3>
-                        <div class="card summary-card">
-                            <p id="out-summary">...</p>
-                        </div>
-                        <h3>Identified Scenarios</h3>
-                        <ul id="out-scenarios" class="scenario-list"></ul>
-                        
-                        <div class="ast-chip-container hidden" id="ast-container">
-                            <span class="chip">AST Extracted</span>
-                        </div>
-                    </div>
-
-                    <div class="tab-content hidden" id="tab-unit">
-                        <div class="code-header">test_unit.py</div>
-                        <pre><code id="out-unit" class="language-python"></code></pre>
-                    </div>
-
-                    <div class="tab-content hidden" id="tab-integration">
-                        <div class="code-header">test_integration.py</div>
-                        <pre><code id="out-integration" class="language-python"></code></pre>
-                    </div>
-
-                    <div class="tab-content hidden" id="tab-edge">
-                        <div class="code-header">test_edge.py</div>
-                        <pre><code id="out-edge" class="language-python"></code></pre>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-    <script src="app.js"></script>
+    <div id="root"></div>
+    <script type="text/babel" src="app.jsx"></script>
 </body>
 </html>
