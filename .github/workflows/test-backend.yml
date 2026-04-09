@@ -19,7 +19,6 @@ jobs:
     - name: Install dependencies
       working-directory: ./backend
       run: |
-        cd backend
         pytest tests
         
     - name: Run Pytest
