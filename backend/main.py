@@ -50,7 +50,7 @@ async def generate_tests(request: CodeRequest):
     
     # Phase 3: Call LLM
     try:
-        raw_llm_response = await generate_tests_from_llm(prompt)
+        raw_llm_response = await generate_tests_from_llm(prompt, request.code)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM Generation Failed: {str(e)}")
         
