@@ -24,6 +24,7 @@ jobs:
         
     - name: Run Pytest
       working-directory: ./backend
-      # Use python -m pytest instead of just pytest
+      env:
+        MOCK: "True"
       run: |
         python -m pytest tests/
