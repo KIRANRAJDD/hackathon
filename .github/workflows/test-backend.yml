@@ -19,7 +19,8 @@ jobs:
     - name: Install dependencies
       working-directory: ./backend
       run: |
-        pytest tests
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
         
     - name: Run Pytest
       working-directory: ./backend
